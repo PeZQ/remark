@@ -1,0 +1,16 @@
+signal 17 received on thread with no signal stack
+
+#include <stdio.h>
+#include <signal.h>
+#include <string.h>
+void savesigchld() {
+	if(action==NULL){
+	sigaction(SIGCHLD, NULL, action);
+	// action->sa_flags = action->sa_flags | SA_NOCLDSTOP;
+	}
+	struct sigaction old_action;
+	sigaction(SIGCHLD, &action, &old_action);
+}
+
+golang before C function
+C.savesigchld()
