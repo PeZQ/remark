@@ -3,14 +3,29 @@ signal 17 received on thread with no signal stack
 #include <stdio.h>
 #include <signal.h>
 #include <string.h>
-void savesigchld() {
-	if(action==NULL){
-	sigaction(SIGCHLD, NULL, action);
-	// action->sa_flags = action->sa_flags | SA_NOCLDSTOP;
-	}
-	struct sigaction old_action;
-	sigaction(SIGCHLD, &action, &old_action);
+
+stack_t stackOld;
+int getstack(){
+	sigaltstack(NULL, &stackOld);
+	return stackOld.ss_flags;
 }
 
+int setstack(){
+	stack_t newStack;
+	newStack.ss_sp = stackOld.ss_sp;
+    newStack.ss_size = stackOld.ss_size;
+    newStack.ss_flags = 0;
+    if (sigaltstack(&newStack, NULL) != 0)
+        fprintf(stderr, "sigaltstack() failed: \n");
+	stack_t stack;
+	sigaltstack(NULL, &stack);
+	return stack.ss_flags;
+}
+
+
 golang before C function
-C.savesigchld()
+C.getstack()
+
+after C function 
+
+C.setstack()
